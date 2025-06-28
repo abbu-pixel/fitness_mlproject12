@@ -17,5 +17,4 @@ def chat():
     return jsonify({"reply": reply})
 
 if __name__ == "__main__":
-    # Bind to 0.0.0.0 so Render/Replit can reach it
-    app.run(host="0.0.0.0", port=5000)
+     app.run(debug=False)
