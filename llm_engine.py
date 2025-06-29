@@ -1,17 +1,30 @@
 import os
-from openai import OpenAI
+import requests
 from dotenv import load_dotenv
 
 load_dotenv()
 
-client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+API_KEY = os.getenv("OPENAI_API_KEY")  # keep using same key name for .env compatibility
+
+headers = {
+    "Authorization": f"Bearer {API_KEY}",
+    "Content-Type": "application/json"
+}
+
+API_URL = "https://openrouter.ai/api/v1/chat/completions"
 
 def generate_response(prompt):
-    response = client.chat.completions.create(
-        model="gpt-3.5-turbo",
-        messages=[
+    body = {
+        "model": "openai/gpt-3.5-turbo",  # Or any model OpenRouter supports
+        "messages": [
             {"role": "system", "content": "You are a helpful assistant."},
             {"role": "user", "content": prompt}
         ]
-    )
-    return response.choices[0].message.content.strip()
+    }
+
+    response = requests.post(API_URL, headers=headers, json=body)
+
+    if response.status_code == 200:
+        return response.json()["choices"][0]["message"]["content"].strip()
+    else:
+        return f"Error: {response.status_code} - {response.text}"
