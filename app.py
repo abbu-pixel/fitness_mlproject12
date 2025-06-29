@@ -1,7 +1,7 @@
 from flask import Flask, render_template, request, jsonify
 from llm_engine import GenAILLM
 
-app = Flask(__name__, static_folder="static", template_folder="templates")
+app = Flask(__name__)
 llm = GenAILLM()
 
 @app.route("/")
@@ -10,11 +10,13 @@ def index():
 
 @app.route("/chat", methods=["POST"])
 def chat():
-    user_input = request.json.get("message", "").strip()
-    if not user_input:
-        return jsonify({"reply": "Please type something!"})
-    reply = llm.query(user_input)
-    return jsonify({"reply": reply})
+    data = request.get_json()
+    user_input = data.get("query", "")
+    try:
+        reply = llm.generate_response(user_input)
+    except Exception as e:
+        reply = f"Error: {str(e)}"
+    return jsonify({"response": reply})
 
 if __name__ == "__main__":
-     app.run(debug=False)
+    app.run(debug=True)
