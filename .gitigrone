@@ -1,3 +1,1 @@
-.env
-__pycache__/
-*.pyc
+OPENAI_API_KEY=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
